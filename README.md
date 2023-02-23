@@ -1,16 +1,23 @@
-### Hi there 👋
+# FotoVerifier: An Image Verification Tool-Suite
+This is official reporitory for the FotoVerifier. The tool suite contains multiple tools for analyzing digital photos for evidence of tampering or manipulation. The tool is designed to help users detect and verify the authenticity of photos by analyzing various image properties, such as metadata, file format, and pixel values.
 
-<!--
-**fotoverifier/fotoverifier** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+# Repository structure
+```
+FotoVerifier/
++--Dedigi     Main class for argus-saf CLI.
++--FotoVerifier         Core static analysis data structures, "*.class"&"*.jawa" file managing, jawa compiler, class hierarchy, method body resolving, flow analysis, etc.
++--Filename    Android resource parsers, information collector, decompiler, environment method builder, flow analysis, etc.
++--cli        Java native interface analysis.
+```
 
-Here are some ideas to get you started:
+# Features
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+# Pubic Platform
+
+# Publications
+
+# Contributing
+
+# License
+
+# Contact
