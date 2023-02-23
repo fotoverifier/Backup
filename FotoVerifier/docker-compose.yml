@@ -1,0 +1,17 @@
+version: '3.1'
+
+services:
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+  backend:
+    build: ./backend
+    restart: unless-stopped
+  nginx:
+    build: ./nginx
+    restart: unless-stopped
+    ports:
+      - 80:80
+    depends_on:
+      - frontend
+      - backend
