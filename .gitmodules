@@ -1,0 +1,3 @@
+[submodule "cli/cli/imageforensics"]
+	path = cli/cli/imageforensics
+	url = https://github.com/pakkunandy/imageforensics.git
