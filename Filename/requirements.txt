@@ -1,0 +1,7 @@
+Flask
+uwsgi
+Pillow
+requests
+tqdm
+pycryptodome
+cloudscraper
