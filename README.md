@@ -4,10 +4,10 @@ This is official reporitory for the FotoVerifier. The tool suite contains multip
 # Repository structure
 ```
 FotoVerifier/
-+--Dedigi     Main class for argus-saf CLI.
-+--FotoVerifier         Core static analysis data structures, "*.class"&"*.jawa" file managing, jawa compiler, class hierarchy, method body resolving, flow analysis, etc.
-+--Filename    Android resource parsers, information collector, decompiler, environment method builder, flow analysis, etc.
-+--cli        Java native interface analysis.
++--Dedigi     
++--FotoVerifier        
++--Filename
++--cli        
 ```
 
 # Features
