@@ -1,5 +1,3 @@
-// const host = "https://sniff.onrender.com";
-
 const startAnalysis = () => {
   const imageID = localStorage.getItem('imageID');
   if (!imageID) {

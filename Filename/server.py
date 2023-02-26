@@ -58,17 +58,21 @@ def get_analyze_result():
 
   return get_success_resp(analyzer_result), 200
 
-@app.route("/analyze_image", methods=["GET"])
-def analyze_image_page():
-  return render_template('analyze_image.html')
-  
-@app.route("/analyze_filename", methods=["GET"])
-def analyze_filename_page():
-  return render_template('analyze_filename.html')
+# @app.route("/analyze_image", methods=["GET"])
+# def analyze_image_page():
+#   return render_template('analyze_image.html')
+
+# @app.route("/analyze_filename", methods=["GET"])
+# def analyze_filename_page():
+#   return render_template('analyze_filename.html')
 
 @app.route("/", methods=["GET"])
 def index_page():
-  return render_template('index.html')
+  return render_template('analyze_filename.html')
+
+@app.route("/about", methods=["GET"])
+def about_page():
+  return render_template('about.html')
 
 if __name__ == "__main__":
   port = int(os.environ.get('PORT', 5000))

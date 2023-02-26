@@ -1,164 +1,86 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
-  <script src="/static/js/jquery.js"></script>
-  <script src="/static/js/bootstrap.bundle.min.js"></script>
-  <title>SNIFF - Analyze</title>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/static/css/index.css" />
+    <script src="/static/js/jquery.js"></script>
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+    <title>Namesleuth - Analyze</title>
+  </head>
 
-  <style>
-    html {
-      position: relative;
-      min-height: 100%;
-    }
-
-    body {
-      margin-bottom: 60px;
-    }
-
-    .footer {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: 60px;
-      line-height: 60px;
-      background-color: #f5f5f5;
-    }
-
-    body>.container {
-      padding: 60px 15px 0;
-    }
-
-    .footer>.container {
-      padding-right: 15px;
-      padding-left: 15px;
-    }
-
-    code {
-      font-size: 80%;
-    }
-
-    .bordered {
-      border-radius: 10px;
-      border: 1px solid black;
-    }
-
-    #frame {
-      height: 500px;
-      width: auto;
-    }
-  </style>
-</head>
-
-<body>
-  <header>
-    <!-- Fixed navbar -->
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark ps-3 pe-3">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="/">SNIFF</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
-                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="/">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/analyze_image">Analyze image</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/analyze_filename">Analyze file name</a>
-            </li>
-          </ul>
+  <body>
+    {% include 'navbar.html' %}
+    <main role="main" class="container pb-5">
+      <h1>Analyze image</h1>
+      <p class="lead">
+        Drop an image here to analyze
+      </p>
+      <section id="image-upload">
+        <div class="container col-md-12">
+          <div class="bordered container mb-5 p-3">
+            <input class="form-control" type="file" id="formFile" onchange="preview()">
+            <button id="uploadButton" onclick="upload()" class="btn btn-primary mt-3">Analyze image</button>
+          </div>
+          <img id="frame" src="" class="img-fluid" />
         </div>
-      </div>
-    </nav>
-  </header>
+      </section>
+      <section role="analysis">
+        <h2 class="mt-5">Analysis results</h2>
+        <div id="facebook-source">
+          <h3 class="mt-5">
+            Facebook source
+            [<a href="#" data-bs-toggle="tooltip" data-bs-title="Where the image is most likely downloaded from Facebook">?</a>]
+          </h3>
+          <i>Because of Facebook's recent updates, this is only usable for images uploaded between July, 2012 and Dec 14<sup>th</sup>, 2022.</i>
+          <div id="facebook-result">
+            Wait for image to be uploaded
+          </div>
+        </div>
+        <div id="flickr-source">
+          <h3 class="mt-5">
+            Flickr source
+            [<a href="#" data-bs-toggle="tooltip" data-bs-title="Where the image is most likely downloaded from Flickr">?</a>]
+          </h3>
+          <div id="flickr-result">
+            Wait for image to be uploaded
+          </div>
+        </div>
+        <div id="reddit-source">
+          <h3 class="mt-5">
+            Reddit source
+            [<a href="#" data-bs-toggle="tooltip" data-bs-title="Where the image is most likely downloaded from Reddit">?</a>]
+          </h3>
+          <div id="reddit-result">
+            Wait for image to be uploaded
+          </div>
+        </div>
+        <div id="metadata">
+          <h3 class="mt-5">Image metadata</h3>
+          <div id="metadata-result">
+            Wait for image to be uploaded
+          </div>
+        </div>
+        <div id="resolution">
+          <h3 class="mt-5">Image resolution</h3>
+          <div id="resolution-result">
+            Wait for image to be uploaded
+          </div>
+        </div>
+      </section>
+    </main>
 
-  <main role="main" class="container pb-5">
-    <h1>Analyze image</h1>
-    <p class="lead">
-      Drop an image here to analyze
-    </p>
-    <section id="image-upload">
-      <div class="container col-md-12">
-        <div class="bordered container mb-5 p-3">
-          <input class="form-control" type="file" id="formFile" onchange="preview()">
-          <button id="uploadButton" onclick="upload()" class="btn btn-primary mt-3">Analyze image</button>
-        </div>
-        <img id="frame" src="" class="img-fluid" />
+    <div class="fixed-bottom">
+      <div class="row justify-content-end">
+        <div id="alert-placeholder" class="col-md-3"></div>
       </div>
-    </section>
-    <section role="analysis">
-      <h2 class="mt-5">Analysis results</h2>
-      <div id="facebook-source">
-        <h3 class="mt-5">
-          Facebook source
-          [<a href="#" data-bs-toggle="tooltip" data-bs-title="Where the image is most likely downloaded from Facebook">?</a>]
-        </h3>
-        <i>Because of Facebook's recent updates, this is only usable for images uploaded between July, 2012 and Dec 14<sup>th</sup>, 2022.</i>
-        <div id="facebook-result">
-          Wait for image to be uploaded
-        </div>
-      </div>
-      <div id="flickr-source">
-        <h3 class="mt-5">
-          Flickr source
-          [<a href="#" data-bs-toggle="tooltip" data-bs-title="Where the image is most likely downloaded from Flickr">?</a>]
-        </h3>
-        <div id="flickr-result">
-          Wait for image to be uploaded
-        </div>
-      </div>
-      <div id="reddit-source">
-        <h3 class="mt-5">
-          Reddit source
-          [<a href="#" data-bs-toggle="tooltip" data-bs-title="Where the image is most likely downloaded from Reddit">?</a>]
-        </h3>
-        <div id="reddit-result">
-          Wait for image to be uploaded
-        </div>
-      </div>
-      <div id="metadata">
-        <h3 class="mt-5">Image metadata</h3>
-        <div id="metadata-result">
-          Wait for image to be uploaded
-        </div>  
-      </div>
-      <div id="resolution">
-        <h3 class="mt-5">Image resolution</h3>
-        <div id="resolution-result">
-          Wait for image to be uploaded
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <div class="fixed-bottom">
-    <div class="row justify-content-end">
-      <div id="alert-placeholder" class="col-md-3"></div>
     </div>
-  </div>
 
-  <footer class="footer">
-    <div class="container">
-      <!-- <span class="text-muted">
-        By <a href="https://github.com/daothienphu">Spookyfish</a> and <a href="https://github.com/haile01">w33b_5h1t</a>
-        with &lt;3
-      </span> -->
-      <span class="text-muted">
-        By <a href="https://github.com/daothienphu">Spookyfish</a> and <a href="https://github.com/haile01">Hai Le</a>
-      </span>
-    </div>
-  </footer>
-
-  <script src="/static/js/analyze.js"></script>
-  <script>
+    {% include 'footer.html' %}
+    <script src="/static/js/analyze.js"></script>
+    <script>
     renderTooltip();
 
 
@@ -190,8 +112,8 @@
       }
       uploadButton.innerHTML = "Analyze image"
     }
-  </script>
-  <script src="/static/js/alert.js"></script>
-</body>
+    </script>
+    <script src="/static/js/alert.js"></script>
+  </body>
 
 </html>

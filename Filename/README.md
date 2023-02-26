@@ -1,5 +1,4 @@
-# sniff
-Social Network Image Focused Forensics
+# Namesleuth
 
 ## How to
 Run ./dev.sh for a hot-reload dev server
