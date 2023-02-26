@@ -11,7 +11,7 @@ services:
     build: ./nginx
     restart: unless-stopped
     ports:
-      - 80:80
+      - 3001:80
     depends_on:
       - frontend
       - backend
