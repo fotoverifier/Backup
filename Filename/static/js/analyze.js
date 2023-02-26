@@ -204,6 +204,7 @@ const createAnchorElement = (url) => {
 const getFacebookSource = async (imageID) => {
   const handleResult = (data) => {
     const content = document.createElement('div');
+
     content.append(createTextElement('p', 'Image source from Facebook: ', data.url == 'Not found' ? data.url : createAnchorElement(data.url)));
     if (data.posted_at) {
       content.append(createTextElement('p', `This image was posted to Facebook at ${data.posted_at}`));

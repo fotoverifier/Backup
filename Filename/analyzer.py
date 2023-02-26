@@ -207,43 +207,41 @@ def find_facebook_url_with_exposed_photoID(filename):
   return res
 
 def find_facebook_url_by_bruteforce(filename):
-  res = {"url": "Not found"}
+  res = {
+    "url": "Not found"
+  }
 
   id = re.findall(RE_PATTERNS["FACEBOOK_WITHOUT_PHOTO_ID"], filename)
   if len(id) > 0:
     id = int(id[0])
-    magic = 3333333
+    magics = [
+      3333333,
+      40001,
+      5000,
+      4990
+    ]
     factors = [
-        0,
-        1,   2,   3,   4,   5,   6,   7,   8,   9,  10,
-       -1,  -2,  -3,  -4,  -5,  -6,  -7,  -8,  -9, -10,
-       11,  12,  13,  14,  15,  16,  17,  18,  19,  20,
-      -11, -12, -13, -14, -15, -16, -17, -18, -19, -20,
-       21,  22,  23,  24,  25,  26,  27,  28,  29,  30,
-      -21, -22, -23, -24, -25, -26, -27, -28, -29, -30,
-       31,  32,  33,  34,  35,  36,  37,  38,  39,  40,
-      -31, -32, -33, -34, -35, -36, -37, -38, -39, -40,
-       41,  42,  43,  44,  45,  46,  47,  48,  49,  50,
-      -41, -42, -43, -44, -45, -46, -47, -48, -49, -50,
-       51,  52,  53,  54,  55,  56,  57,  58,  59,  60,
-      -51, -52, -53, -54, -55, -56, -57, -58, -59, -60,
-       61,  62,  63,  64, 
-      -61, -62, -63, -64]
-    for i in factors:
-      fbid = str(id + magic * i)
-      print(f"Trying... {fbid}")
-      url = f'{URL_TEMPLATES["FACEBOOK_PHOTO"]}{fbid}'
-      r = requests.get(url, headers=HEADERS)
-      if filename not in r.text:
-        continue
+      0,
+      1, -1, 2, -2, 3, -3, 4, -4, 5, -5,
+      6, -6, 7, -7, 8, -8, 9, -9, 10, -10
+    ]
+    for magic in magics:
+      for i in factors:
+        fbid = str(id + magic * i)
+        print(f"Trying... {fbid}")
+        url = f'{URL_TEMPLATES["FACEBOOK_PHOTO"]}{fbid}'
+        r = requests.get(url, headers=HEADERS)
+        if filename not in r.text:
+          continue
 
-      posted_date = find_facebook_posted_date(fbid, r.text)
+        posted_date = find_facebook_posted_date(fbid, r.text)
 
-      if posted_date != None:
-        res["url"] = f'{URL_TEMPLATES["FACEBOOK_PHOTO"]}{fbid}'
-        res["posted_at"] = posted_date
-        print("factor", i)
-        break
+        if posted_date != None:
+          res["url"] = f'{URL_TEMPLATES["FACEBOOK_PHOTO"]}{fbid}'
+          res["posted_at"] = posted_date
+
+          return res
+
   return res
 
 def find_facebook_posted_date(fbid, content):
@@ -304,7 +302,7 @@ def analyze_twitter_filename(full_filename):
     "url": "Not found"
   }
 
-  filename = full_filename[:full_filename.index(".")]
+  filename = full_filename.split('.')[0]
   #print(filename)
 
   url = f"{URL_TEMPLATES['TWITTER_PHOTO_FIRST']}{filename}{URL_TEMPLATES['TWITTER_PHOTO_SECOND']}"
@@ -317,6 +315,7 @@ def analyze_twitter_filename(full_filename):
   try:
     filename = filename + "=" * (16 - (len(filename) % 16))
     decoded = base64.urlsafe_b64decode(filename)
+    assert len(decoded) == 11
     num = bytes_to_long(decoded)
     timestamp_bit_length = 42 - (88 - num.bit_length())
     num_bitstring = bin(num)[2:]
@@ -495,7 +494,7 @@ def analyze_filename(filename):
   res['twitter'] = analyze_twitter_filename(filename)
   res['reddit'] = analyze_reddit_filename(filename)
   res['9gag'] = analyze_9gag_filename(filename)
-  res['4chan'] = analyze_4chan_filename(filename)
+  # res['4chan'] = analyze_4chan_filename(filename)
 
   RESULT_CACHE[filename]['filename'] = res
   return res
