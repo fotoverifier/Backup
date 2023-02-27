@@ -1,10 +1,10 @@
-<!-- # DeDigi - Digital Image Forensics tool
-Hosted at: [https://dedigi.herokuapp.com](https://dedigi.herokuapp.com)
+# DeDigi - Digital Image Forensics tool
+Hosted at: [https://dedigi.fotoverifier.eu/](https://dedigi.fotoverifier.eu/)
 
 ## Description
 **DeDigi** is a project created by [Quynh-Chau Long-Vu](https://www.linkedin.com/in/lvqchau/) and [Hai-Son Nguyen](https://www.linkedin.com/in/nguyen-son99/), with the purpose of creating a tool for detecting manipulation attempts on a digital image. The tool uses existing Digital Image Forensics techniques, along with other functionalities, to further engage the user into the tool.
 
-*This project was first created for a graduate project thesis at University Of Science, Ho Chi Minh City, Vietnam from June to August.*
+<!-- *This project was first created for a graduate project thesis at University Of Science, Ho Chi Minh City, Vietnam from June to August.*
 
 
 ## Installation
@@ -15,13 +15,11 @@ git clone https://github.com/lvqchau/dedigi
 cd dedigi
 npm install
 npm start
-```
+``` -->
 
 
-
+<!-- 
 *For more information, contact <dedigi.diftool@gmail.com>* -->
 
-# DeDigi - Digital Image Forensics Tool - User Guide
-### Upload an image
-User can upload a new image for analysis
-![Upload](images/upload.png)
+## User Guide:
+More at: [https://dedigi.fotoverifier.eu/tutorial](https://dedigi.fotoverifier.eu/tutorial)
