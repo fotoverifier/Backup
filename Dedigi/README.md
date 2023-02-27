@@ -1,4 +1,4 @@
-# DeDigi - Digital Image Forensics tool
+<!-- # DeDigi - Digital Image Forensics tool
 Hosted at: [https://dedigi.herokuapp.com](https://dedigi.herokuapp.com)
 
 ## Description
@@ -19,4 +19,9 @@ npm start
 
 
 
-*For more information, contact <dedigi.diftool@gmail.com>*
+*For more information, contact <dedigi.diftool@gmail.com>* -->
+
+# DeDigi - Digital Image Forensics Tool - User Guide
+### Upload an image
+User can upload a new image for analysis
+![Upload](images/upload.png)
