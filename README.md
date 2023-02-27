@@ -5,15 +5,15 @@ This is official reporitory for the FotoVerifier. The tool suite contains multip
 ```
 FotoVerifier/
 +--Dedigi		An online platform for digital image forensics.     
-+--FotoVerifier 	A training system for digital image forensics.       
++--NameSlueth 		A training system for digital image forensics.       
 +--Filename		An online tool for uploaded image's filename analysis.	
 +--cli        		A collection of python scripts for image forensics.
 ```
 
 ## Pubic Platform
-* [Dedigi](http://dedigi.fotoverifier.com/)
-* [FotoVerifier](http://www.fotoverifier.com/)
-* [NameSleuth](http://namesleuth.fotoverifier.com/)
+* [Dedigi](https://dedigi.fotoverifier.eu/)
+* [FotoVerifier](https://www.fotoverifier.eu/)
+* [NameSleuth](https://namesleuth.fotoverifier.eu/)
 
 ## Publications
 * Chi-Hao Tran, Quoc-Thang Tran, Quynh-Chau Long-Vu, Hai-Son Nguyen, Anh-Duy Tran, and Duc-Tien Dang-Nguyen. 2022. [DeDigi: A Privacy-by-Design Platform for Image Forensics](https://dl.acm.org/doi/10.1145/3512731.3534213). In Proceedings of the 3rd ACM Workshop on Intelligent Cross-Data Analysis and Retrieval (ICDAR '22). Association for Computing Machinery, New York, NY, USA, 58–62. https://doi.org/10.1145/3512731.3534213
