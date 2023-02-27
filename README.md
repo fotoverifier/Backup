@@ -4,9 +4,9 @@ This is official reporitory for the FotoVerifier. The tool suite contains multip
 ## Repository structure
 ```
 FotoVerifier/
-+--Dedigi		An online platform for digital image forensics.     
-+--NameSlueth 		A training system for digital image forensics.       
-+--Filename		An online tool for uploaded image's filename analysis.	
++--Dedigi		    An online platform for digital image forensics.     
++--FotoVerifier 	A training system for digital image forensics.       
++--NameSlueth		An online tool for uploaded image's filename analysis.	
 +--cli        		A collection of python scripts for image forensics.
 ```
 
