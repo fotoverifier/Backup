@@ -22,7 +22,10 @@
       <section id="file-name-input">
         <div class="container col-md-12">
           <div class="bordered container mb-5 p-3">
-            <input class="form-control" type="text" id="filename">
+            <p class="lead">Uploade the image to extract the filename</p>
+            <input class="form-control" type="file" id="formFile" onchange="getFileName()">
+            <p class="lead mt-3">Or input the file name manually</p>
+            <input class="form-control" type="text" id="filename" placeholder="Input the filename...">
             <div class="hstack mt-3">
               <button id="uploadButton" onclick="analyze()" class="btn btn-primary">Analyze</button>
               <span class="text-muted align-baseline ms-3">Analyzing process may take up to a few minutes</span>
@@ -76,8 +79,12 @@
     // TODO: Refactor this :D
     renderTooltip();
 
+    const getFileName = () => {
+       filename.value = event.target.files[0].name;
+    }
+
     const analyze = async () => {
-      const filename = document.getElementById('filename').value
+      const filename = document.getElementById('filename').value.trim()
       if (filename.length === 0) {
         alertMessage("File name cannot be empty", 'warning');
       }
