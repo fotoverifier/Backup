@@ -1,6 +1,0 @@
-src/__pycache__
-src/*.pyc
-env/
-db.sqlite3
-docs/
-*.log
