@@ -41,7 +41,10 @@ Without the correct SSL certificate, Nginx won't run properly. We are using cert
 5. restart nginx to check if the website is working properly on https.
 
 ### DeDigi
-_todo_
+We used `pm2` to effortlessly deploy a node server. Simply:
+1. Install pm2: `npm i -g pm2`, sudo if needed
+2. Install deps: `npm ci`
+3. Deploy with pm2: `pm2 start npm -- start` (this should bind to localhost:3000 by default)
 
 ### FotoVerifier
 Run `docker-compose up --build -d` to build the project and run on `localhost:3001`
