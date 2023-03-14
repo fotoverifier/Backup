@@ -19,6 +19,36 @@ FotoVerifier/
 * Chi-Hao Tran, Quoc-Thang Tran, Quynh-Chau Long-Vu, Hai-Son Nguyen, Anh-Duy Tran, and Duc-Tien Dang-Nguyen. 2022. [DeDigi: A Privacy-by-Design Platform for Image Forensics](https://dl.acm.org/doi/10.1145/3512731.3534213). In Proceedings of the 3rd ACM Workshop on Intelligent Cross-Data Analysis and Retrieval (ICDAR '22). Association for Computing Machinery, New York, NY, USA, 58–62. https://doi.org/10.1145/3512731.3534213
 * Dang-Nguyen, Duc-Tien, Vegard Velle Sjøen, Dinh-Hai Le, Thien-Phu Dao, Anh-Duy Tran, and Minh-Triet Tran. [Practical Analyses of How Common Social Media Platforms and Photo Storage Services Handle Uploaded Images](https://arxiv.org/abs/2302.12133). arXiv.org, February 23, 2023. https://arxiv.org/abs/2302.12133. 
 
+## Deployment
+By default, port assignment for each service is:
+- Dedigi: 3000
+- FotoVerifier: 3001
+- NameSleuth: 3002
+
+Please make sure that these ports are not occupied before starting deployment.
+
+### Nginx configuration
+There will be an Nginx served before these 3 services as a reverse-proxy server. It will then redirect the request to a correct service based on the host.
+
+Copy the `nginx.conf` file to `/etc/nginx/nginx.conf` and run `service nginx start` to start the service
+
+**SSL configuration**
+Without the correct SSL certificate, Nginx won't run properly. We are using certbot's certificate in the current deployment. To host one for your own. You need to 
+1. comment out all commands relating to https and ssl. 
+2. run nginx to make sure it works properly on port 80. 
+3. issue an ssl certificate from certbot.
+4. replace the certificate path, uncomment ssl and https commands.
+5. restart nginx to check if the website is working properly on https.
+
+### DeDigi
+_todo_
+
+### FotoVerifier
+Run `docker-compose up --build -d` to build the project and run on `localhost:3001`
+
+### NameSleuth
+Run the bash script `run.sh` to build the project and run on `localhost:3002`
+
 ## Contributing
 
 ## License
