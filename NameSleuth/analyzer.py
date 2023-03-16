@@ -343,8 +343,7 @@ def analyze_twitter_filename(full_filename):
     #print(date)
 
     analyze_result["uploaded_date"] = date.strftime("%A, %B %d, %Y, %H:%M:%S UTC")
-  except Exception as e:
-    print(e)
+  except:
     pass
 
   return analyze_result
