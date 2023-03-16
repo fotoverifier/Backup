@@ -5,4 +5,4 @@ export FLASK_APP=server.py
 export FLASK_ENV=development
 export UPLOAD_FOLDER=./
 
-python3 -m flask run --port 8080
+python3 -m flask run --port 8081

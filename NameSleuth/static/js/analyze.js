@@ -11,6 +11,16 @@ const startAnalysis = () => {
   getRedditSource(imageID);
 }
 
+const addBadgeElement = (elementID) => {
+  document.getElementById(elementID).classList.add("bg-success");
+  document.getElementById(elementID).classList.remove("bg-secondary");
+}
+
+const removeBadgeElement = (elementID) => {
+  document.getElementById(elementID).classList.remove("bg-success");
+  document.getElementById(elementID).classList.add("bg-secondary");
+}
+
 const rewriteElement = (elementID, content) => {
   const element = document.getElementById(elementID);
   if (typeof content === 'string') {

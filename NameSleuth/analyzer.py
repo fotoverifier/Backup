@@ -28,13 +28,13 @@ RE_PATTERNS = {
   "FLICKR_ID_GROUP_1":         r'([0-9]+)_.*?_o',
   "FLICKR_ID_GROUP_2":         r'.*?_([0-9]+)_o',
 
-  "TWITTER_PHOTO_ID":          r'([A-Za-z0-9\-]{15})[\.]*',
+  "TWITTER_PHOTO_ID":          r'([A-Za-z0-9\-]{15})',
 
-  "REDDIT_PHOTO_ID":           r'([a-z0-9]{13}\.)',
+  "REDDIT_PHOTO_ID":           r'([a-z0-9]{13})',
 
-  "9GAG_PHOTO_ID":             r'([a-zA-Z0-9]{7})_[0-9]{3}[a-z0-9]*\.[a-z0-9]*',
+  "9GAG_PHOTO_ID":             r'([a-zA-Z0-9]{7})_[0-9]{3}[a-z0-9]*',
 
-  "4CHAN_PHOTO_ID":            r'([0-9]*)\.[a-zA-Z0-9]*',
+  "4CHAN_PHOTO_ID":            r'([0-9]*)',
 }
 
 URL_TEMPLATES = {
@@ -55,6 +55,7 @@ URL_TEMPLATES = {
   "4CHAN_PHOTO":          "https://i.4cdn.org/"
 }
 
+# main
 def analyze(image_id, analyze_type):
   if image_id not in RESULT_CACHE:
     return "Image id not uploaded"
@@ -143,10 +144,22 @@ def analyze(image_id, analyze_type):
   print(analyze_type, analyze_result)
   return analyze_result
 
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Main ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv Helper vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+def analyze_filename(filename):
+  filename = format_filename(filename)
+  cache_filename(filename)
 
-#general
+  res = {}
+  res['facebook'] = analyze_facebook_filename(filename)
+  res['flickr'] = analyze_flickr_filename(filename)
+  res['twitter'] = analyze_twitter_filename(filename)
+  res['reddit'] = analyze_reddit_filename(filename)
+  res['9gag'] = analyze_9gag_filename(filename)
+  # res['4chan'] = analyze_4chan_filename(filename)
+
+  RESULT_CACHE[filename]['filename'] = res
+  return res
+
+# general
 def register(image_file):
   if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -165,6 +178,9 @@ def format_filename(filename):
     char_category = unicodedata.category(c)[0]
     if char_category != "C" and char_category != "Z": #C are control chars, Z are separator chars https://www.unicode.org/reports/tr44/#GC_Values_Table
       res += c
+
+  # NOTE: remove extension to unify behaviors
+  res = res.split('.')[0]
   return res
 
 def cache_filename(filename):
@@ -177,7 +193,7 @@ def cache_filename(filename):
     RESULT_CACHE[filename] = {}
 
 
-#facebook
+# facebook
 def analyze_facebook_filename(filename):
   analyze_result = {
     "url": "Not found"
@@ -263,7 +279,7 @@ def find_facebook_posted_date(fbid, content):
   return res
 
 
-#flickr
+# flickr
 def analyze_flickr_filename(filename):
   analyze_result = {
     "url": "Not found"
@@ -296,7 +312,7 @@ def find_flickr_posted_date(content):
 
   return res
 
-#twitter
+# twitter
 def analyze_twitter_filename(full_filename):
   analyze_result = {
     "url": "Not found"
@@ -316,36 +332,31 @@ def analyze_twitter_filename(full_filename):
     filename = filename + "=" * (16 - (len(filename) % 16))
     decoded = base64.urlsafe_b64decode(filename)
     assert len(decoded) == 11
-    num = bytes_to_long(decoded)
-    timestamp_bit_length = 42 - (88 - num.bit_length())
-    num_bitstring = bin(num)[2:]
-    TimeStamp = num_bitstring[: timestamp_bit_length]
-    # MachineID = num_bitstring[timestamp_bit_length : timestamp_bit_length + 10]
-    # SequenceNum = num_bitstring[timestamp_bit_length + 10 : timestamp_bit_length + 22]
-    # offset = num_bitstring[timestamp_bit_length + 22 :]
-    # print("TS ", TimeStamp)
-    # print("MID", MachineID)
-    # print("SN ", SequenceNum)
-    # print("OS ", offset)
+    num = int.from_bytes(decoded, byteorder='big')
+    bit_length = 8 * len(decoded)
+    timestamp_bit_length = 42
+    timestamp = num >> (bit_length - timestamp_bit_length)
 
     TWITTER_EPOCH = 1288834974657
-    timestamp = (int(TimeStamp, 2) + TWITTER_EPOCH)/1000
+    timestamp = (timestamp + TWITTER_EPOCH)/1000
     date = datetime.datetime.utcfromtimestamp(timestamp)
     #print(date)
 
-    analyze_result["uploaded_date"] = date
-  except:
+    analyze_result["uploaded_date"] = date.strftime("%A, %B %d, %Y, %H:%M:%S UTC")
+  except Exception as e:
+    print(e)
     pass
 
   return analyze_result
 
-#reddit
+# reddit
 def analyze_reddit_filename(filename):
   analyze_result = {
     "url": "Not found"
   }
 
   filename = re.findall(RE_PATTERNS["REDDIT_PHOTO_ID"], filename)
+  print(filename)
 
   if len(filename) > 0:
     filename = filename[-1]
@@ -356,7 +367,8 @@ def analyze_reddit_filename(filename):
       r = requests.get(url, headers=HEADERS)
       #print("Error retrieving results from Reddit, retrying...")
 
-    analyze_result = find_reddit_posted_date(r.text)
+    print(r.json())
+    analyze_result = find_reddit_posted_date(r.json())
 
   return analyze_result
 
@@ -365,7 +377,7 @@ def find_reddit_posted_date(content):
     "results": [],
     "numOfResults": 0
   }
-  content = json.loads(content)
+  print(content, flush=True)
   res['numOfResults'] = len(content["data"]["children"])
 
   for i in range(res["numOfResults"]):
@@ -373,6 +385,8 @@ def find_reddit_posted_date(content):
       "url": "https://www.reddit.com" + content["data"]["children"][i]["data"]["permalink"],
       "postedDate": int(content["data"]["children"][i]["data"]["created_utc"])
     }
+
+    print(result, flush=True)
 
     res['results'].append(result)
 
@@ -383,7 +397,7 @@ def find_reddit_posted_date(content):
 
   return res
 
-#9gag
+# 9gag
 def analyze_9gag_filename(full_filename):
   analyze_result = {
     "url": "Not found"
@@ -456,7 +470,7 @@ def backup_9gag(full_filename):
     return True
   return False
 
-#4chan
+# 4chan
 def analyze_4chan_filename(full_filename):
   analyze_result = {
     "url": "Not found"
@@ -484,20 +498,6 @@ def analyze_4chan_filename(full_filename):
       
   return analyze_result
 
-def analyze_filename(filename):
-  filename = format_filename(filename)
-  cache_filename(filename)
-
-  res = {}
-  res['facebook'] = analyze_facebook_filename(filename)
-  res['flickr'] = analyze_flickr_filename(filename)
-  res['twitter'] = analyze_twitter_filename(filename)
-  res['reddit'] = analyze_reddit_filename(filename)
-  res['9gag'] = analyze_9gag_filename(filename)
-  # res['4chan'] = analyze_4chan_filename(filename)
-
-  RESULT_CACHE[filename]['filename'] = res
-  return res
 
 if __name__ == "__main__":
   filename = "319215965_671994327935328_6727973423313150380_n.jpg"
