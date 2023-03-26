@@ -25,8 +25,8 @@ RE_PATTERNS = {
   "FACEBOOK_WITH_PHOTO_ID":    r'[0-9]+_[0-9]+_[0-9]+_[a-z]{1}_([0-9]+)',
   "FACEBOOK_WITHOUT_PHOTO_ID": r'[0-9]+_([0-9]+)_[0-9]+_[a-z]{1}',
 
-  "FLICKR_ID_GROUP_1":         r'([0-9]+)_.*?_o',
-  "FLICKR_ID_GROUP_2":         r'.*?_([0-9]+)_o',
+  "FLICKR_ID_GROUP_1":         r'([0-9]+)_.+?(?:_(?:s|q|t|m|n|w|z|c|b|h|k|f|3k|4k|5k|6k|o))?',
+  "FLICKR_ID_GROUP_2":         r'.+?_([0-9]+)(?:_(?:s|q|t|m|n|w|z|c|b|h|k|f|3k|4k|5k|6k|o))?',
 
   "TWITTER_PHOTO_ID":          r'([A-Za-z0-9\-]{15})',
 
