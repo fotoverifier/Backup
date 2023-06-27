@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Upload</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <style>
+
+	body {
+		font-family: 'Roboto', sans-serif;
+		background-color: #f0f0f0;
+	}
+
+	h1 {
+		text-align: center;
+		margin-top: 50px;
+		color: #333;
+	}
+
+	form {
+		max-width: 500px;
+		margin: 50px auto;
+		padding: 30px;
+		border-radius: 10px;
+		background-color: white;
+		box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+	}
+
+	.form-group {
+		margin-bottom: 20px;
+	}
+
+	label {
+		display: block;
+		margin-bottom: 10px;
+		color: #333;
+	}
+
+	.upload-area {
+		height: 100px;
+		border: 2px dashed #ccc;
+		line-height: 100px;
+		text-align: center;
+		font-size: 20px;
+		color: #ccc;
+	}
+
+	.upload-area:hover {
+		background-color: #f9f9f9;
+	}
+
+	button[type="submit"] {
+		display: block;
+		width: 100%;
+		background-color: #4CAF50;
+		color: white;
+		border-radius: 5px;
+	}
+
+	.form-control,
+	.btn {
+		display: block;
+		width: 100%;
+	}
+
+	.form-control:focus,
+	.btn:focus,
+	.btn:hover {
+		outline: none !important;
+		box-shadow: none !important;
+	}
+
+
+
+
+	h2 {
+	 color: #4CAF50;
+	 font-size: 24px;
+	 line-height: 1.25;
+	 font-family: "Roboto Slab", serif;
+	 margin-top: 20px;
+	 margin-bottom: 20px;
+	}
+	/*
+	.tab-slider--nav {
+		width: 100%;
+		text-align: center;
+		float: left;
+		margin-bottom: 20px;
+		margin-top: 50px;
+	}
+	.tab-slider--tabs {
+		display: inline-block;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		position: relative;
+		border-radius: 35px;
+		overflow: hidden;
+		background: #fff;
+		height: 47px;
+		user-select: none;
+	}
+	.tab-slider--tabs:after {
+		content: "";
+		width: 50%;
+		background: #4CAF50;
+		height: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
+		transition: all 250ms ease-in-out;
+		border-radius: 35px;
+	}
+	.tab-slider--tabs.slide:after {
+		left: 50%;
+	}
+	.tab-slider--trigger {
+		font-size: 20px;
+		line-height: 1;
+		font-weight: bold;
+		color: #4CAF50;
+		text-align: center;
+		padding: 12px 22px;
+		position: relative;
+		z-index: 2;
+		cursor: pointer;
+		display: inline-block;
+		transition: color 250ms ease-in-out;
+		user-select: none;
+		margin-left: -0.4em;
+	}
+	.tab-slider--trigger.active {
+		color: #fff;
+	}
+	.tab-slider--body {
+		margin-bottom: 20px;
+	}*/
+	.tab-slider--nav {
+  width: 100%;
+  text-align: center;
+  float: left;
+  margin-bottom: 20px;
+  margin-top: 50px;
+}
+
+.tab-slider--tabs {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  position: relative;
+  border-radius: 35px;
+  overflow: hidden;
+  background: #fff;
+  height: 47px;
+  width: 45%; /* Adjust the width as desired */
+  margin: 0 auto; /* Center the tabs horizontally */
+  user-select: none;
+  justify-content: space-between;
+}
+
+.tab-slider--tabs:after {
+  content: "";
+  width: 33.33%; /* Updated to accommodate three tabs */
+  background: #4CAF50;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: all 250ms ease-in-out;
+  border-radius: 35px;
+}
+
+.tab-slider--tabs.slide1:after {
+  left: 33.33%; /* Updated to accommodate three tabs */
+}
+
+.tab-slider--tabs.slide2:after {
+  left: 66.66%; /* Updated to accommodate three tabs */
+}
+
+.tab-slider--trigger {
+  font-size: 20px;
+  line-height: 1;
+  font-weight: bold;
+  color: #4CAF50;
+  text-align: center;
+  padding: 12px 22px;
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+  display: inline-block;
+  transition: color 250ms ease-in-out;
+  user-select: none;
+  margin-left: -0.4em;
+}
+
+.tab-slider--trigger.active {
+  color: #fff;
+}
+
+.tab-slider--body {
+  margin-bottom: 20px;
+}
+	
+	.overlay{
+		position: fixed;
+		top: 50px;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0, 0, 0, 0.5);
+		display: none;
+		z-index: 9999;
+	}
+
+	.suggested-images {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		max-width: 800px;
+		margin-top: 20px;
+	}
+
+	.image-wrapper {
+		width: calc(33.33% - 10px);
+		margin-bottom: 20px;
+	}
+
+	.image-preview {
+		height: 150px;
+		background-size: cover;
+		background-position: center;
+		cursor: pointer;
+		border-radius: 5px;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	}
+
+	.suggested-images .image-preview:hover {
+		transform: scale(1.1);
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+	}
+
+	.image-name {
+		text-align: center;
+		margin-top: 10px;
+		font-weight: bold;
+	}
+/* CSS for the loading spinner */
+.loader {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+	<div class="alert alert-info" id="imageAlert" role="alert">
+		<p style="font-size: 16px;"><b>Note:</b> This feature will process your images on the server side. Therefore, the privacy of the photo is not guaranteed. Once the images are analysed, they will be removed from the server.</p>
+	</div>
+    <div class="container">
+		<div class="tab-slider--nav">
+			<ul class="tab-slider--tabs">
+				<li class="tab-slider--trigger active" rel="tab1">Single image </li>
+				<li class="tab-slider--trigger" rel="tab2">Collection</li>
+				<li class="tab-slider--trigger" rel="tab3">Cam matching</li>
+			</ul>
+		</div>
+		<div class="tab-slider--container">
+			<div id="tab1" class="tab-slider--body">
+				<h1>Image Upload</h1>
+				<form id="image-upload-form" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+					<div class="form-group">
+						<label for="file">Select Image:</label>
+						<input type="file" id="file" name="file" class="form-control" required>
+					</div>
+					<div class="form-group">
+						<label>Or drag and drop image here:</label>
+						<div class="upload-area" id="upload-area" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">Drag and Drop Image Here</div>
+					</div>
+					<button type="submit" class="btn btn-primary">Submit</button>
+				
+					<h3 style="font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; color: #4CAF50;">Or try with our sample images!</h3>
+					<div class="suggested-images">
+						<div class="image-wrapper">
+							<div class="image-preview" style="background-image: url('{{ url_for('static', filename='Apple_iPhone13_Rear_0_Nat_36.jpg') }}');" onclick="sendImage('Apple_iPhone13_Rear_0_Nat_36.jpg');"></div>
+							<div class="image-name">Apple iPhone 13 Rear</div>
+						</div>
+						<div class="image-wrapper">
+							<div class="image-preview" style="background-image: url('{{ url_for('static', filename='Apple_iPadmini5_Frontal_0_Nat_157.jpg') }}');" onclick="sendImage('Apple_iPadmini5_Frontal_0_Nat_157.jpg');"></div>
+							<div class="image-name">Apple iPad mini 5 Frontal</div>
+						</div>
+						<div class="image-wrapper">
+							<div class="image-preview" style="background-image: url('{{ url_for('static', filename='Canon_EOSR_Rear_0_Nat_251.jpg') }}');" onclick="sendImage('Canon_EOSR_Rear_0_Nat_251.jpg');"></div>
+							<div class="image-name">Canon EOSR Rear</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div id="tab2" class="tab-slider--body">
+				<h1>Upload multiple images</h1>
+				<form action="{{ url_for('upload') }}" id="form_multiple" method="POST" enctype="multipart/form-data">
+					<div class="form-group">
+						<label for="file">Select Images:</label>
+						<input type="file" id="file1" name="file1" class="form-control" multiple="true" required>
+					</div>
+					<div class="form-group">
+						<label>Or drag and drop the images here:</label>
+						<div class="upload-area" id="upload-area1">Drag and Drop Images Here</div>
+					</div>
+					<button type="submit" class="btn btn-primary">Submit</button>
+					<div id="spinner"></div>
+				</form>
+			</div>
+			<!--Camera matching-->
+			<div id="tab3" class="tab-slider--body">
+				<h1>Camera matching</h1>
+				<form action="{{ url_for('upload') }}" id="form_matching" method="POST" enctype="multipart/form-data">
+					<div class="form-group">
+						<label for="file2">Select Images:</label>
+						<input type="file" id="file2" name="file2" class="form-control" multiple="true" required>
+						<br>
+						<label for="file3">Query image:</label>
+						<input type="file" id="file3" name="file3" class="form-control" required>
+					</div>
+					<button type="submit" class="btn btn-primary">Submit</button>
+					<div id="spinner1"></div>
+				</form>
+			</div>
+		</div>
+    </div>
+	<div class="overlay"></div>
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script>
+	$("document").ready(function() {
+		$('.loader').remove();
+		$(".tab-slider--body").hide();
+		$(".tab-slider--body:first").show();
+}	);
+
+	$(".tab-slider--nav li").click(function() {
+		$(".tab-slider--body").hide();
+		var activeTab = $(this).attr("rel");
+		$("#" + activeTab).fadeIn();
+		if ($(this).attr("rel") == "tab2") {
+			$('.tab-slider--tabs').addClass('slide1');
+			$('.tab-slider--tabs').removeClass('slide2');
+		} else if($(this).attr("rel") == "tab3"){
+			$('.tab-slider--tabs').addClass('slide2');
+		}
+		else {
+			$('.tab-slider--tabs').removeClass('slide1');
+			$('.tab-slider--tabs').removeClass('slide2');
+		}
+		$(".tab-slider--nav li").removeClass("active");
+		$(this).addClass("active");
+	});
+
+
+	function sendImage(imageName) {
+		// Create a hidden input field to hold the image URL
+		var input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'image_name';
+		input.value = imageName;
+
+		// Append the hidden input field to the form
+		document.getElementById('image-upload-form').appendChild(input);
+
+		// Submit the form
+		document.getElementById('image-upload-form').submit();
+	}
+			
+	var fileInput = document.getElementById('file');
+	var uploadArea = document.getElementById('upload-area');
+
+	fileInput.addEventListener('change', function() {
+		if (fileInput.files.length > 0 && fileInput.files.length < 2) {
+			uploadArea.style.backgroundColor = '#4CAF50';
+			uploadArea.style.color = 'white';
+			uploadArea.innerHTML = 'Image Selected!';
+			setTimeout(function() {
+				uploadArea.style.backgroundColor = '';
+				uploadArea.style.color = '#ccc';
+				uploadArea.innerHTML = 'Drag and Drop Image Here';
+			}, 1500);
+		}
+		else{
+			alert("Error: Only one file allowed.");
+            fileInput.value = ''; // Clear the file input
+            return;
+		}
+	});
+
+	uploadArea.addEventListener('dragover', function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+	});
+
+	uploadArea.addEventListener('dragleave', function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+	});
+
+	uploadArea.addEventListener('drop', function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		var files = e.dataTransfer.files;
+		if(files.length > 1){
+			alert("Error: Only one file allowed.");
+			fileInput.value = ''; // Clear the file input
+			return;
+		}
+		
+		fileInput.files = files;
+
+		uploadArea.style.backgroundColor = '#4CAF50';
+		uploadArea.style.color = 'white';
+		uploadArea.innerHTML = 'Image Selected!';
+		setTimeout(function() {
+			uploadArea.style.backgroundColor = '';
+			uploadArea.style.color = '#ccc';
+			uploadArea.innerHTML = 'Drag and Drop Image Here';
+		}, 1500);
+		
+	});
+
+	$("#form_multiple").submit(function() {
+		$(".overlay").show()
+		$("#spinner").html('<div class="loader"></div>');
+	});
+
+	$("#form_matching").submit(function() {
+		$(".overlay").show()
+		$("#spinner1").html('<div class="loader"></div>');
+	});
+
+
+	// In case the page is being shown from the cache (back/forward button)
+	$(window).on('pageshow', function(event) {
+        if (event.originalEvent.persisted) {
+            $(".overlay").hide();
+			$('.loader').remove();
+        }
+    });
+
+	var fileInput1 = document.getElementById('file1');
+	var uploadArea1 = document.getElementById('upload-area1');
+
+	fileInput1.addEventListener('change', function() {
+		if (fileInput1.files.length > 0) {
+			uploadArea1.style.backgroundColor = '#4CAF50';
+			uploadArea1.style.color = 'white';
+			uploadArea1.innerHTML = 'Image Selected!';
+			setTimeout(function() {
+				uploadArea1.style.backgroundColor = '';
+				uploadArea1.style.color = '#ccc';
+				uploadArea1.innerHTML = 'Drag and Drop Image Here';
+			}, 1500);
+		}
+	});
+
+	uploadArea1.addEventListener('dragover', function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+	});
+
+	uploadArea1.addEventListener('dragleave', function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+	});
+
+	uploadArea1.addEventListener('drop', function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		var files = e.dataTransfer.files;
+		
+		fileInput1.files = files;
+
+		uploadArea1.style.backgroundColor = '#4CAF50';
+		uploadArea1.style.color = 'white';
+		uploadArea1.innerHTML = 'Image Selected!';
+		setTimeout(function() {
+			uploadArea1.style.backgroundColor = '';
+			uploadArea1.style.color = '#ccc';
+			uploadArea1.innerHTML = 'Drag and Drop Image Here';
+		}, 1500);
+		
+	});
+    </script>
+	</body>
+</html>

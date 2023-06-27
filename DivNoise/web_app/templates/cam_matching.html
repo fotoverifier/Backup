@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camera matching</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu|Lora">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@600&family=Poppins:wght@300&family=Ubuntu:wght@500&display=swap" rel="stylesheet">
+	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <style>
+    #left-side, #right-side {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+    }
+
+    #container {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 80vh;
+    }
+
+    #left-side {
+      	flex-direction: column;
+    }
+
+    #tick {
+		width: 200px;
+		height: 300px;
+    }
+
+    .photostack {
+		position: relative;
+		display: inline-block;
+	}
+
+	.photostack img {
+		position: relative;
+		border: 5px solid white;
+		box-shadow: 0 2px 3px 0 rgba(0, 0, 0, .15);
+		z-index: 3;
+	}
+
+	.photostack:before, .photostack:after {
+		position: absolute;
+		top: 0;
+		left: 0;
+		content: '';
+		display: inline-block;
+		width: 100%;
+		height: 100%;
+		background: white;
+		transform: rotate(5deg);
+		z-index: 2;
+		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .2);
+		background-color: cadetblue;
+	}
+
+	.photostack:after {
+		transform: rotate(-5deg);
+		box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .2);
+		z-index: 1;
+		background-color: bisque;
+	}
+
+	.photostack:nth-child(2n):before {
+		transform: rotate(-2deg);
+	}
+
+	.photostack:nth-child(2n):after {
+		transform: rotate(1.5deg);
+	}
+
+	.photostack:nth-child(3n):before {
+		transform: rotate(-1deg);
+	}
+
+	.photostack:nth-child(3n):after {
+		transform: rotate(-3deg);
+	}
+
+	.photostack:nth-child(5n):before {
+		transform: rotate(2.5deg);
+	}
+
+	.photostack:nth-child(5n):after {
+		transform: rotate(-2deg);
+	}
+
+	img {
+		max-width: 450px;
+		max-height: 450px;
+	}
+
+	.check-wrap {
+		width: 70px;
+		height: 70px;
+		border-radius: 50%;
+		border: 2px solid #00cf1f;
+		position: relative;
+		overflow: hidden;
+		animation: wrap 0.3s ease-in-out forwards;
+		animation-delay: 0.3s;
+		transform: scale(0);
+		top: 25px;
+		display: none;
+		padding-bottom: 20px;
+		margin:auto;
+	}
+
+	.check-wrap::before, .check-wrap::after {
+		content: '';
+		position: absolute;
+		background-color: white;
+		width: 0;
+		height: 5px;
+		transform-origin: left;
+		animation-duration: 0.3s;
+		animation-timing-function: ease-in-out;
+		animation-fill-mode: forwards;
+	}
+
+	.check-wrap::before {
+		top: 32px;
+		left: 21px;
+		transform: rotate(45deg);
+		animation-name: left;
+		animation-delay: 0.8s;
+	}
+
+	.check-wrap::after {
+		top: 42px;
+		left: 29px;
+		transform: rotate(-45deg);
+		animation-name: right;
+		animation-delay: 1.1s;
+	}
+	@keyframes wrap {
+		0% {
+			background-color: transparent;
+			transform: scale(0);
+		}
+		100% {
+			background-color: #00cf1f;
+			transform: scale(1);
+		}
+	}
+	@keyframes left {
+		0% {
+			width: 0;
+		}
+		100% {
+			width: 15px;
+		}
+	}
+	@keyframes right {
+		0% {
+			width: 0;
+		}
+		100% {
+			width: 30px;
+		}
+	}
+
+	.check-wrap-negative {
+		width: 70px;
+		height: 70px;
+		border-radius: 50%;
+		border: 2px solid #cf0015;
+		position: relative;
+		overflow: hidden;
+		animation: wrapnegative 0.3s ease-in-out forwards;
+		animation-delay: 0.3s;
+		transform: scale(0);
+		top: 25px;
+		display: none;
+		padding-bottom: 20px;
+		margin:auto;
+	}
+	.check-wrap-negative::before, .check-wrap-negative::after {
+		content: '';
+		position: absolute;
+		background-color: white;
+		width: 0;
+		height: 5px;
+		transform-origin: leftnegative;
+		animation-duration: 0.3s;
+		animation-timing-function: ease-in-out;
+		animation-fill-mode: forwards;
+	}
+	.check-wrap-negative::before {
+		top: 32px;
+		left: 19px;
+		transform: rotate(45deg);
+		animation-name: leftnegative;
+		animation-delay: 0.8s;
+	}
+	.check-wrap-negative::after {
+		top: 32px;
+		left: 19px;
+		transform: rotate(-45deg);
+		animation-name: rightnegative;
+		animation-delay: 1.1s;
+	}
+
+	@keyframes wrapnegative {
+		0% {
+			background-color: transparent;
+			transform: scale(0);
+		}
+		100% {
+			background-color: #cf0015;
+			transform: scale(1);
+		}
+	}
+
+	@keyframes leftnegative {
+		0% {
+			width: 0;
+		}
+		100% {
+			width: 30px;
+		}
+	}
+	@keyframes rightnegative {
+		0% {
+			width: 0;
+		}
+		100% {
+			width: 30px;
+		}
+	}
+ 
+	.btn {
+		margin-right: 10px;
+		background-color: rgb(71, 183, 132);
+		color: #fff;
+		border: none; 
+		border-radius: 10px;
+	}
+
+	.btn:hover {
+		outline-color: transparent;
+		outline-style: solid;
+		box-shadow: 0 0 0 2px black;
+	}
+
+	.button {
+		display: flex;
+		overflow: hidden;
+
+		margin: auto;
+		padding: 12px 12px;
+
+		cursor: pointer;
+		user-select: none;
+		transition: all 150ms linear;
+		text-align: center;
+		white-space: nowrap;
+		text-decoration: none !important;
+		text-transform: none;
+		text-transform: capitalize;
+
+		color: #fff;
+		border: 0 none;
+		border-radius: 36px;
+
+		font-size: 20px;
+		font-weight: 500;
+		line-height: 1.3;
+
+		-webkit-appearance: none;
+		-moz-appearance:    none;
+		appearance:         none;
+		
+		justify-content: center;
+		align-items: center;
+		flex: 0 0 160px;
+		
+		box-shadow: 2px 5px 10px #e4e4e4;
+		margin-bottom: 20px;
+	}
+
+	.button.-green {
+		color: #FFFFFF;
+		background: #3dd28d;
+	}
+
+	.button.-alge {
+		color: white;
+		background: #7999a9;
+	}
+
+	.disabled{
+		pointer-events: none;
+		cursor: not-allowed;
+	}
+  </style>
+</head>
+<body>
+	<nav>
+        <div class="nav-wrapper" style="background-color: rgb(6, 130, 76);">
+           <img src="{{ url_for('static', filename='favicon.ico') }}" width="60px" style="margin-left: 10px;">
+           <ul id="nav-mobile" class="right hide-on-med-and-down">
+               <!--<li><button onclick="">&#10067; Tutorial</button></li>-->
+               <li><button class="btn" onclick="gobacktoupload()">&#127748; Analyze new image</button></li>
+           </ul>
+        </div>
+   </nav>
+   <div class="alert alert-warning" id="imageAlert" role="alert">
+	<p style="font-size: 16px;"><b>Note:</b> When comparing query images to the reference pattern, similarity scores within the range of 100 to 130 indicate that the images belong to the same model. If the score falls between 130 and 140, the model experiences uncertainty and is not able to make a definitive determination. However, if the score surpasses 140, it means that the query image comes from a different model. The higher the number of images used for computing the fingerprint, the better the noise estimate.</p>
+	</div>
+  <div id="container">
+    <div id="left-side">
+        <div class="photostack">
+            <img src="{{ url_for('send_image', filename=image_group) }}" />
+          </div>
+    </div>
+    <div id="tick">
+		<div class='button -green center disabled'>Camera model</div>
+        <div class="check-wrap" id="positive"></div>
+        <div class="check-wrap-negative" id="negative"></div>
+		<div class='button -alge center disabled' style="text-align: center; margin-top:70px; padding: 6px 6px; width: 160px;">Distance: {{noiseprint_distance}}</div>
+		<!--<div class="check-wrap" id="positive1"></div>
+        <div class="check-wrap-negative" id="negative1"></div>
+		<div style="text-align: center;"><b><p style="font-size: 18px;">Distance: {{prnu_distance}}</p></b></div>-->
+    </div>
+    <div id="right-side">
+      <img src="{{url_for('send_image', filename=filename)}}" style="position: relative; border: 5px solid white; box-shadow: 0 2px 3px 0 rgba(0, 0, 0, .15); z-index: 3;" alt="Right Image">
+    </div>
+  </div>
+</body>
+<script>
+
+	$(document).ready(function() {
+		var dist = '{{ noiseprint_distance }}';
+		//var pce = '{{ prnu_distance }}'
+		if(parseInt(dist)>130){
+			document.getElementById("negative").style.display = "block";
+			//document.getElementById("negative1").style.display = "block";
+		}else{
+			document.getElementById("positive").style.display = "block";
+			/*if(parseInt(pce)<20){
+				document.getElementById("positive1").style.display = "block";
+			}
+			else{
+				document.getElementById("negative1").style.display = "block";
+			}*/
+		}
+		setTimeout(function() {
+			fetch('/cleanup', { method: 'POST' });
+		}, 2000); 
+	});
+
+	window.addEventListener('beforeunload', function() {
+    	fetch('/cleanup', { method: 'POST' });
+	});
+
+	function gobacktoupload(){
+		var base_url = window.location.origin;
+		window.location.replace(base_url);
+	}
+</script>
+</html>

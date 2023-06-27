@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Results</title>
+	<!-- Include Material Design CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu|Lora">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@600&family=Poppins:wght@300&family=Ubuntu:wght@500&display=swap" rel="stylesheet">
+	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<!-- Add custom styles -->
+	<style>
+		.container {
+			margin-top: 30px;
+		}
+		.card {
+			border-radius: 8px;
+			box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+			overflow: hidden;
+		}
+		.card-image {
+			height: 100%;
+			overflow: hidden;
+		}
+		.card-image img {
+			object-fit: cover;
+			height: 100%;
+			width: 100%;
+		}
+		.card-content {
+			padding: 24px;
+			background-color: #f2f2f2;
+			color: #212121;
+		}
+		.section {
+			background-color: #e0e0e0;
+			padding: 10px 0;
+			margin-top: 30px;
+			border-radius: 8px;
+			box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+			overflow: hidden;
+		}
+		.section-content {
+			padding: 24px;
+			color: #212121;
+		}
+		button {
+			margin-right: 10px;
+			background-color: rgb(71, 183, 132);
+			color: #fff;
+			border:none; 
+			border-radius:10px; 
+			padding:15px;
+			min-height:30px; 
+			min-width: 120px;
+  		}
+
+  		button:hover {
+			outline-color: transparent;
+			outline-style:solid;
+			box-shadow: 0 0 0 2px black;
+		}
+
+		 /* CSS for the loading spinner */
+		 .loader {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+	</style>
+</head>
+<body>
+	<!-- Add a navigation menu at the top of the page -->
+	<nav>
+		 <div class="nav-wrapper" style="background-color: rgb(6, 130, 76);">
+			<img src="{{ url_for('static', filename='favicon.ico') }}" width="60px" style="margin-left: 10px;">
+			<ul id="nav-mobile" class="right hide-on-med-and-down">
+				<!--<li><button onclick="">&#10067; Tutorial</button></li>-->
+				<li><button onclick="gobacktoupload()">&#127748; Analyze new image</button></li>
+			</ul>
+		 </div>
+	</nav>
+	
+	<!-- Create a container for the page content -->
+	<div class="container" style="font-family: Ubuntu, sans-serif;">
+		<!-- Add a row to divide the page into two columns -->
+		<div class="row">
+			<!-- Add a column for the image on the right side -->
+			<div class="col s12 m6">
+                <div class="card">
+					<div class="card-content">
+						<h4>Exif Metadata</h4>
+						<div style="overflow-y: auto;">
+							<table>
+								{% for key, value in metadata.items() %}
+								  {% if key == 'Model' or key == 'Make' %}
+									<tr>
+									  <td style="text-transform: capitalize; font-family: Ubuntu, sans-serif; font-weight: 500;"><b>{{ key }}</b></td>
+									  <td style="text-transform: capitalize; padding-left: 40px;"><b>{{ value }}</b></td>
+									</tr>
+								  {% endif %}
+								{% endfor %}
+								{% for key, value in metadata.items() %}
+								  {% if key != 'Model' and key!= 'Make' %}
+									<tr>
+									  <td style="text-transform: capitalize; font-family: Ubuntu, sans-serif; font-weight: 500;">{{ key }}</td>
+									  <td style="text-transform: capitalize; padding-left: 40px;">{{ value }}</td>
+									</tr>
+								  {% endif %}
+								{% endfor %}
+							  </table>							  
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Add a column for the information on the left side -->
+			<div class="col s12 m6">
+				<div class="card" >
+					<div class="card-content" style="padding:5px; text-align: center;">
+						<h4>Your image</h4>
+					</div>
+				</div>
+                <div class="card">
+					<div class="card-image">
+						<img src="{{url_for('send_image', filename=filename)}}" alt="Placeholder Image">
+					</div>
+				</div>
+                <!-- Add a section below the image and information -->
+                <div class="section">
+                    <div class="section-content">
+                        <h3>Analysis results</h3>
+						<div id="dynamic-section" style="text-align: center;">
+							<h5>The image is being processed... Wait a moment</h5>
+						</div>
+                    </div>
+                </div>
+			</div>
+		</div>
+    </div>
+</body>
+<script>
+	function gobacktoupload(){
+		var base_url = window.location.origin;
+		window.location.replace(base_url);
+	}
+	$(document).ready(function() {
+		// Display the loading spinner
+		$('#dynamic-section').html('<div class="loader"></div>');
+
+		$.ajax({
+			type: 'POST',
+			url: '/dynamic_model',
+			success: function(response) {
+				// Update the section with the dynamic content
+				$('#dynamic-section').html("<h5>Based on our analysis, the image closely aligns with the reference pattern associated with the <b>"+response.message+"</b> camera</h5>");
+				// Clean up the image on the server once it has been analysed 
+				fetch('/cleanup', { method: 'POST' });
+			},
+			error: function() {
+				// Display an error message if the request fails
+				$('#dynamic-section h5').html('<h5>Error occurred while loading content.</h5>');
+			},
+			complete: function() {
+				// Remove the loading spinner once the request is complete
+				$('.loader').remove();
+			}
+		});
+     });
+
+	window.addEventListener('beforeunload', function() {
+    	fetch('/cleanup', { method: 'POST' });
+	});
+</script>
+</html>
