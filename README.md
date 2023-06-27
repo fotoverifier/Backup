@@ -8,7 +8,7 @@ FotoVerifier/
 +--FotoVerifier 	A training system for digital image forensics.       
 +--NameSlueth		An online tool for uploaded image's filename analysis.	
 +--cli        		A collection of python scripts for image forensics.
-+--DivNoise       An online tool for camera model identification
++--DivNoise                   An online tool for camera model identification
 ```
 
 ## Pubic Platform
