@@ -8,12 +8,14 @@ FotoVerifier/
 +--FotoVerifier 	A training system for digital image forensics.       
 +--NameSlueth		An online tool for uploaded image's filename analysis.	
 +--cli        		A collection of python scripts for image forensics.
++--DivNoise     An online tool for camera model identification
 ```
 
 ## Pubic Platform
 * [Dedigi](https://dedigi.fotoverifier.eu/)
 * [FotoVerifier](https://www.fotoverifier.eu/)
 * [NameSleuth](https://namesleuth.fotoverifier.eu/)
+* [DivNoise](https://divnoise.fotoverifier.eu/)
 
 ## Publications
 * Chi-Hao Tran, Quoc-Thang Tran, Quynh-Chau Long-Vu, Hai-Son Nguyen, Anh-Duy Tran, and Duc-Tien Dang-Nguyen. 2022. [DeDigi: A Privacy-by-Design Platform for Image Forensics](https://dl.acm.org/doi/10.1145/3512731.3534213). In Proceedings of the 3rd ACM Workshop on Intelligent Cross-Data Analysis and Retrieval (ICDAR '22). Association for Computing Machinery, New York, NY, USA, 58–62. https://doi.org/10.1145/3512731.3534213
@@ -24,11 +26,13 @@ By default, port assignment for each service is:
 - Dedigi: 3000
 - FotoVerifier: 3001
 - NameSleuth: 3002
+- DivNoise: 3003
+- DivNoise Demo: 3004
 
 Please make sure that these ports are not occupied before starting deployment.
 
 ### Nginx configuration
-There will be an Nginx served before these 3 services as a reverse-proxy server. It will then redirect the request to a correct service based on the host.
+There will be an Nginx served before these 4 services as a reverse-proxy server. It will then redirect the request to a correct service based on the host.
 
 Copy the `nginx.conf` file to `/etc/nginx/nginx.conf` and run `service nginx start` to start the service
 
@@ -51,6 +55,9 @@ Run `docker-compose up --build -d` to build the project and run on `localhost:30
 
 ### NameSleuth
 Run the bash script `run.sh` to build the project and run on `localhost:3002`
+
+### DivNoise
+Run `docker build -t divnoise .` to build the docker image. Then for running the container `docker run -d -p 3004:3004 --name divnoise divnoise`.
 
 ## Contributing
 
