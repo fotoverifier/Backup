@@ -1,5 +1,5 @@
 # DivNoise | A tool for camera model identification
-DivNoise is hosted at [www.divnoise.fotoverifier.eu](https://www.divnoise.fotoverifier.eu) and consists of three functionalities: 
+DivNoise is hosted at [www.divnoise.fotoverifier.eu](https://divnoise.fotoverifier.eu) and consists of three functionalities: 
 - Single image analysis (upload an image and find out the camera model)
 - Multiple image analysis (upload a set of images and check whether they come from the same camera model)
 - Camera matching (provide a set of images taken with the same camera model to compute the 'fingerprint of the model', and a query image to be compared with the fingerprint in order to check whether they come from the same camera model)
