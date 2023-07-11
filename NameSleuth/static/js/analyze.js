@@ -238,57 +238,64 @@ const getFacebookSource = async (imageID) => {
 const handleFlickrResult = (data) => {
   // Flickr
   const animationList = [];
-  const content = document.createElement('div');
+  const contentFlickr = document.createElement('div');
 
-  content.append(createTextElement('p', 'Image source from Flickr: ', data.url == 'Not found' ? data.url : createAnchorElement(data.url)));
-  if (data.posted_date) {
-    const tmp = createTextElement('p', 'This image was posted to Flickr at ');
-    tmp.append(createTextElement('b', data.posted_date));
-    content.append(tmp);
+  if (data.url != 'Not found') {
+    contentFlickr.append(createTextElement('p', 'Image source from Flickr: ', createAnchorElement(data.url)));
+    if (data.posted_date) {
+      const tmp = createTextElement('p', 'This image was posted to Flickr at ');
+      tmp.append(createTextElement('b', data.posted_date));
+      contentFlickr.append(tmp);
+    }
+    if (data.taken_date) {
+      const tmp = createTextElement('p', 'This image was taken at ');
+      tmp.append(createTextElement('b', data.taken_date));
+      contentFlickr.append(tmp);
+    }
+    if (data.time_analysis) {
+      const timeAnalysis = data.time_analysis;
+      const timeContent = document.createElement('div');
+      const title = createTextElement('p', 'Uploaded time speculation based on ID [');
+      title.append(createTooltipElement('?', 'Because Flickr IDs tends to increase with time, uploaded time of adjacent IDs can suggest the actual uploaded time as this piece of data is modifiable by authors'));
+      title.append(']');
+
+      timeContent.append(title);
+
+      const timeContentList = document.createElement('div');
+      timeContentList.classList.add('flickr-time-list');
+
+      console.log(timeAnalysis);
+      const total = Object.keys(timeAnalysis).reduce((cur, key) => cur + parseInt(timeAnalysis[key]), 0);
+      Object.keys(timeAnalysis).forEach((time) => {
+        const count = timeAnalysis[time];
+        timeContentList.append(createTextElement('b', time));
+
+        const bar = document.createElement('div');
+        bar.classList.add('flickr-time-bar');
+        bar.classList.add('bg-success');
+        const id = `flickr-time-bar-${time}`;
+        bar.id = id;
+
+        const barContainer = document.createElement('div');
+        barContainer.classList.add('flickr-time-bar-container');
+        barContainer.append(bar);
+
+        timeContentList.append(barContainer);
+
+        animationList.push({ id, style: { width: `${count / total * 100}%` } })
+      })
+
+      timeContent.append(timeContentList);
+      contentFlickr.append(timeContent);
+    }
+
+    addBadgeElement('flickr-result-title');
   }
-  if (data.taken_date) {
-    const tmp = createTextElement('p', 'This image was taken at ');
-    tmp.append(createTextElement('b', data.taken_date));
-    content.append(tmp);
-  }
-  if (data.time_analysis) {
-    const timeAnalysis = data.time_analysis;
-    const timeContent = document.createElement('div');
-    const title = createTextElement('p', 'Uploaded time speculation based on ID [');
-    title.append(createTooltipElement('?', 'Because Flickr IDs tends to increase with time, uploaded time of adjacent IDs can suggest the actual uploaded time as this piece of data is modifiable by authors'));
-    title.append(']');
-
-    timeContent.append(title);
-
-    const timeContentList = document.createElement('div');
-    timeContentList.classList.add('flickr-time-list');
-
-    console.log(timeAnalysis);
-    const total = Object.keys(timeAnalysis).reduce((cur, key) => cur + parseInt(timeAnalysis[key]), 0);
-    Object.keys(timeAnalysis).forEach((time) => {
-      const count = timeAnalysis[time];
-      timeContentList.append(createTextElement('b', time));
-
-      const bar = document.createElement('div');
-      bar.classList.add('flickr-time-bar');
-      bar.classList.add('bg-success');
-      const id = `flickr-time-bar-${time}`;
-      bar.id = id;
-
-      const barContainer = document.createElement('div');
-      barContainer.classList.add('flickr-time-bar-container');
-      barContainer.append(bar);
-
-      timeContentList.append(barContainer);
-
-      animationList.push({ id, style: { width: `${count / total * 100}%` } })
-    })
-
-    timeContent.append(timeContentList);
-    content.append(timeContent);
+  else {
+    contentFlickr.append(createTextElement('p', 'Image source from Flickr: Not found'));
   }
 
-  rewriteElement('flickr-result', content);
+  rewriteElement('flickr-result', contentFlickr);
 
   animationList.forEach((animation) => {
     Object.keys(animation.style).forEach((attr) => {
@@ -297,6 +304,7 @@ const handleFlickrResult = (data) => {
       }, 500); // Wait for elements to be rendered
     })
   })
+
 }
 
 const getFlickrSource = async (imageID) => {
