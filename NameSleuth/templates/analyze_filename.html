@@ -138,84 +138,12 @@
 
         if (res.success) {
           alertMessage("File name uploaded successfully", 'success');
-
-          // Facebook
-          const contentFacebook = document.createElement('div');
-
-          if (res.data.facebook.url === "Not found") {
-            contentFacebook.append(createTextElement('p', 'Image source from Facebook: Not found'));
-          }
-          else {
-            contentFacebook.append(createTextElement('p', 'Image source from Facebook: ', createAnchorElement(res.data.facebook.url)));
-            if (res.data.facebook.posted_at) {
-              contentFacebook.append(createTextElement('p', `This image was posted to Facebook at ${res.data.facebook.posted_at}`));
-            }
-            addBadgeElement('facebook-result-title');
-          }
-
-          rewriteElement('facebook-result', contentFacebook);
-
-          // Flickr
-          const contentFlickr = document.createElement('div');
-
-          if (res.data.flickr.url === 'Not found') {
-            contentFlickr.append(createTextElement('p', 'Image source from Flickr: Not found'));
-          }
-          else {
-            contentFlickr.append(createTextElement('p', 'Image source from Flickr: ', createAnchorElement(res.data.flickr.url)));
-
-            if (res.data.flickr.posted_date) {
-              contentFlickr.append(createTextElement('p', `This image was posted to Flickr at ${res.data.flickr.posted_date}`));
-            }
-            if (res.data.flickr.posted_date) {
-              contentFlickr.append(createTextElement('p', `This image was taken at ${res.data.flickr.taken_date}`));
-            }
-
-            addBadgeElement('flickr-result-title');
-          }
-
-          rewriteElement('flickr-result', contentFlickr);
-
-          // Twitter
-          const contentTwitter = document.createElement('div');
-          if (res.data.twitter.url === "Not found") {
-            contentTwitter.append(createTextElement('p', "Image doesn't seem to exist on Twitter"))
-          }
-          else {
-            contentTwitter.append(createTextElement('p', "Image was uploaded to Twitter at ", createAnchorElement(res.data.twitter.url)));
-            contentTwitter.append(createTextElement('p', `Upload time: ${res.data.twitter.uploaded_date}`));
-
-            addBadgeElement('twitter-result-title');
-          }
-
-          rewriteElement('twitter-result', contentTwitter);
-
-          // Reddit
-          const contentReddit = document.createElement('div');
-          if (res.data.reddit.numOfResults) {
-            if (res.data.reddit.numOfResults === 1) {
-              contentReddit.append(createTextElement('p', 'Image source from Reddit: ', createAnchorElement(res.data.reddit.results[0].url)));
-              contentReddit.append(createTextElement('p', `This image was posted to Reddit at ${res.data.reddit.results[0].postedDate} (UTC)`));
-            }
-            else {
-              contentReddit.append(createTextElement('i', 'This image was uploaded on Reddit in many posts'));
-              contentReddit.append(createTextElement('p', ''))
-              res.data.reddit.results.forEach((result, i) => {
-                let subContent = document.createElement('div');
-                subContent.append(createTextElement('b', `Source #${parseInt(i) + 1}: `))
-                subContent.append(createAnchorElement(result.url));
-                subContent.append(createTextElement('p', `This image was posted to Reddit at ${result.postedDate} (UTC)`))
-
-                contentReddit.append(subContent);
-              });
-            }
-            addBadgeElement('reddit-result-title');
-          }
-          else {
-            contentReddit.append(createTextElement('p', 'Image source from Reddit: Not found'));
-          }
-
-          rewriteElement('reddit-result', contentReddit);
+          const data = res.data;
+          console.log(data);
+          handleFacebookResult(data.facebook);
+          handleFlickrResult(data.flickr);
+          handleTwitterResult(data.twitter);
+          handleRedditResult(data.reddit);
         }
         else {
           alertMessage(res.data.error, 'danger');

@@ -38,3 +38,29 @@ code {
     height: 500px;
     width: auto;
 }
+
+.flickr-time-list {
+    display: grid;
+    grid-template-columns: 150px auto;
+    column-gap: 5px;
+}
+
+.flickr-time-list > b {
+    margin: 0;
+    text-align: center;
+    height: 40px;
+    line-height: 40px;
+    vertical-align: center;
+}
+
+.flickr-time-bar-container {
+    position: relative;
+    height: 20px;
+    padding: 10px 0px;
+}
+
+.flickr-time-bar {
+    transition: width .5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    width: 0;
+    height: 20px;
+}

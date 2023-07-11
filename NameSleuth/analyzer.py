@@ -11,6 +11,7 @@ import base64
 from Crypto.Util.number import bytes_to_long
 import json
 import cloudscraper
+from dateutil.relativedelta import relativedelta
 
 # for caching images
 RESULT_CACHE = {}
@@ -55,8 +56,11 @@ URL_TEMPLATES = {
     "4CHAN_PHOTO":          "https://i.4cdn.org/"
 }
 
-# main
+# Auxiliary parameters
+FLICKR_ID_RANGE = 1e5
+FLICKR_TOP = 3
 
+# main
 
 def analyze(image_id, analyze_type):
     if image_id not in RESULT_CACHE:
@@ -143,13 +147,15 @@ def analyze(image_id, analyze_type):
         return False  # Image not uploaded
 
     RESULT_CACHE[image_id][analyze_type] = analyze_result
-    print(analyze_type, analyze_result)
+    # print(analyze_type, analyze_result)
     return analyze_result
 
 
 def analyze_filename(filename):
     filename = format_filename(filename)
-    cache_filename(filename)
+    cached_result = fetch_cache(filename)
+    if cached_result:
+        return cached_result
 
     res = {}
     res['facebook'] = analyze_facebook_filename(filename)
@@ -191,7 +197,7 @@ def format_filename(filename):
     return res
 
 
-def cache_filename(filename):
+def fetch_cache(filename):
     if filename in RESULT_CACHE:
         if 'filename' in RESULT_CACHE[filename]:
             return RESULT_CACHE[filename]['filename']
@@ -199,6 +205,8 @@ def cache_filename(filename):
             RESULT_CACHE[filename]['filename'] = {}
     else:
         RESULT_CACHE[filename] = {}
+
+    return None
 
 
 # facebook
@@ -256,7 +264,7 @@ def find_facebook_url_by_bruteforce(filename):
         for magic in magics:
             for i in factors:
                 fbid = str(id + magic * i)
-                print(f"Trying... {fbid}")
+                # print(f"Trying... {fbid}")
                 url = f'{URL_TEMPLATES["FACEBOOK_PHOTO"]}{fbid}'
                 r = requests.get(url, headers=HEADERS)
                 if filename not in r.text:
@@ -309,8 +317,78 @@ def analyze_flickr_filename(filename):
             analyze_result = res
             analyze_result["url"] = f'{URL_TEMPLATES["FLICKR_PHOTO"]}{flkrid}'
 
+    if len(matched_ids) > 0:
+        flkrid = matched_ids[0]
+        r = requests.get(f'{URL_TEMPLATES["FLICKR_PHOTO"]}{flkrid}', headers=HEADERS)
+        res = find_flickr_posted_date(r.text)
+        if res != None:
+            analyze_result = res
+            analyze_result["url"] = f'{URL_TEMPLATES["FLICKR_PHOTO"]}{flkrid}'
+            analyze_result["time_analysis"] = get_adjacent_ids(flkrid)
+
     return analyze_result
 
+
+def get_info(data):
+    assert len(data) == 24, "chunk length must be 24"
+    id = int.from_bytes(data[:8], byteorder='little')
+    date_posted = int.from_bytes(data[8:16], byteorder='little')
+    date_taken = int.from_bytes(data[16:], byteorder='little')
+
+    return { "id": id, "date_posted": date_posted, "date_taken": date_taken }
+
+def get_adjacent_ids(id):
+  id = int(id) - FLICKR_ID_RANGE
+  res = {}
+
+  with open('flickr_ids', 'rb') as f:
+    f.seek(0, os.SEEK_END)
+    n = f.tell() / 24
+    l = 0
+    r = n - 1
+    mid = 0
+    idx = 0
+
+    while l <= r:
+        mid = int(l + r) >> 1
+        f.seek(24 * mid)
+        i = get_info(f.read(24))['id']
+
+        if i <= id:
+            idx = mid
+            l = mid + 1
+        else:
+            r = mid - 1
+
+    f.seek(24 * idx)
+
+    id += 2 * FLICKR_ID_RANGE
+
+    tmp_map = {}
+    tmp = []
+
+    while True:
+        if f.tell() == n * 24:
+            break
+
+        info = get_info(f.read(24))
+        # print(info)
+        if int(info['id']) > id:
+            break
+
+        date_posted = datetime.datetime.fromtimestamp(info['date_posted'])
+        date_posted = date_posted.strftime("%d-%m-%Y")
+        if date_posted not in tmp_map:
+            tmp_map[date_posted] = len(tmp)
+            tmp.append([date_posted, 0])
+
+        tmp[tmp_map[date_posted]][1] += 1
+
+    tmp.sort(key=lambda x: x[1], reverse=True)
+    for i in range(min(len(tmp), FLICKR_TOP)): 
+        res[tmp[i][0]] = tmp[i][1]
+
+    return res
 
 def find_flickr_posted_date(content):
     matched_taken_date = re.findall(r'"dateTaken":"(.*?)"', content)
@@ -324,7 +402,7 @@ def find_flickr_posted_date(content):
     }
 
     if len(matched_taken_date) != 0:
-        res["taken_date"] = unquote(matched_taken_date[0])
+        res['taken_date'] = datetime.datetime.strptime(unquote(matched_taken_date[0]), '%Y-%m-%d %H:%M:%S')
 
     return res
 
@@ -387,7 +465,7 @@ def analyze_reddit_filename(filename):
             r = requests.get(url, headers=HEADERS)
             # print("Error retrieving results from Reddit, retrying...")
 
-        print(r.json())
+        # print(r.json())
         analyze_result = find_reddit_posted_date(r.json())
 
     return analyze_result
@@ -398,7 +476,7 @@ def find_reddit_posted_date(content):
         "results": [],
         "numOfResults": 0
     }
-    print(content, flush=True)
+    # print(content, flush=True)
     res['numOfResults'] = len(content["data"]["children"])
 
     for i in range(res["numOfResults"]):
@@ -407,7 +485,7 @@ def find_reddit_posted_date(content):
             "postedDate": int(content["data"]["children"][i]["data"]["created_utc"])
         }
 
-        print(result, flush=True)
+        # print(result, flush=True)
 
         res['results'].append(result)
 

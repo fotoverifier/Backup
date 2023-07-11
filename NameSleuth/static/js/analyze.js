@@ -8,6 +8,7 @@ const startAnalysis = () => {
   getResolution(imageID);
   getFacebookSource(imageID);
   getFlickrSource(imageID);
+  getTwitterSource(imageID);
   getRedditSource(imageID);
 }
 
@@ -211,67 +212,149 @@ const createAnchorElement = (url) => {
   return element;
 }
 
-const getFacebookSource = async (imageID) => {
-  const handleResult = (data) => {
-    const content = document.createElement('div');
+const handleFacebookResult = (data) => {
+  // Facebook
+  const contentFacebook = document.createElement('div');
 
-    content.append(createTextElement('p', 'Image source from Facebook: ', data.url == 'Not found' ? data.url : createAnchorElement(data.url)));
+  if (data.url === "Not found") {
+    contentFacebook.append(createTextElement('p', 'Image source from Facebook: Not found'));
+  }
+  else {
+    contentFacebook.append(createTextElement('p', 'Image source from Facebook: ', createAnchorElement(data.url)));
     if (data.posted_at) {
-      content.append(createTextElement('p', `This image was posted to Facebook at ${data.posted_at}`));
+      contentFacebook.append(createTextElement('p', `This image was posted to Facebook at ${data.posted_at}`));
     }
-
-    rewriteElement('facebook-result', content);
+    addBadgeElement('facebook-result-title');
   }
 
-  fetchAnalysisResult(imageID, 'facebook_filename', 'facebook-result', handleResult);
+  rewriteElement('facebook-result', contentFacebook);
+}
+
+const getFacebookSource = async (imageID) => {
+  fetchAnalysisResult(imageID, 'facebook_filename', 'facebook-result', handleFacebookResult);
+}
+
+
+const handleFlickrResult = (data) => {
+  // Flickr
+  const animationList = [];
+  const content = document.createElement('div');
+
+  content.append(createTextElement('p', 'Image source from Flickr: ', data.url == 'Not found' ? data.url : createAnchorElement(data.url)));
+  if (data.posted_date) {
+    const tmp = createTextElement('p', 'This image was posted to Flickr at ');
+    tmp.append(createTextElement('b', data.posted_date));
+    content.append(tmp);
+  }
+  if (data.taken_date) {
+    const tmp = createTextElement('p', 'This image was taken at ');
+    tmp.append(createTextElement('b', data.taken_date));
+    content.append(tmp);
+  }
+  if (data.time_analysis) {
+    const timeAnalysis = data.time_analysis;
+    const timeContent = document.createElement('div');
+    const title = createTextElement('p', 'Uploaded time speculation based on ID [');
+    title.append(createTooltipElement('?', 'Because Flickr IDs tends to increase with time, uploaded time of adjacent IDs can suggest the actual uploaded time as this piece of data is modifiable by authors'));
+    title.append(']');
+
+    timeContent.append(title);
+
+    const timeContentList = document.createElement('div');
+    timeContentList.classList.add('flickr-time-list');
+
+    console.log(timeAnalysis);
+    const total = Object.keys(timeAnalysis).reduce((cur, key) => cur + parseInt(timeAnalysis[key]), 0);
+    Object.keys(timeAnalysis).forEach((time) => {
+      const count = timeAnalysis[time];
+      timeContentList.append(createTextElement('b', time));
+
+      const bar = document.createElement('div');
+      bar.classList.add('flickr-time-bar');
+      bar.classList.add('bg-success');
+      const id = `flickr-time-bar-${time}`;
+      bar.id = id;
+
+      const barContainer = document.createElement('div');
+      barContainer.classList.add('flickr-time-bar-container');
+      barContainer.append(bar);
+
+      timeContentList.append(barContainer);
+
+      animationList.push({ id, style: { width: `${count / total * 100}%` } })
+    })
+
+    timeContent.append(timeContentList);
+    content.append(timeContent);
+  }
+
+  rewriteElement('flickr-result', content);
+
+  animationList.forEach((animation) => {
+    Object.keys(animation.style).forEach((attr) => {
+      setTimeout(() => {
+        document.getElementById(animation.id).style[attr] = animation.style[attr];
+      }, 500); // Wait for elements to be rendered
+    })
+  })
 }
 
 const getFlickrSource = async (imageID) => {
-  const handleResult = (data) => {
-    const content = document.createElement('div');
-    content.append(createTextElement('p', 'Image source from Flickr: ', data.url == 'Not found' ? data.url : createAnchorElement(data.url)));
-    if (data.posted_date) {
-      content.append(createTextElement('p', `This image was posted to Flickr at ${data.posted_date}`));
-    }
-    if (data.posted_date) {
-      content.append(createTextElement('p', `This image was taken at ${data.taken_date}`));
-    }
+  fetchAnalysisResult(imageID, 'flickr_filename', 'flickr-result', handleFlickrResult);
+}
 
-    rewriteElement('flickr-result', content);
+const handleRedditResult = (data) => {
+  // Reddit
+  const contentReddit = document.createElement('div');
+  if (data.numOfResults) {
+    if (data.numOfResults === 1) {
+      contentReddit.append(createTextElement('p', 'Image source from Reddit: ', createAnchorElement(data.results[0].url)));
+      contentReddit.append(createTextElement('p', `This image was posted to Reddit at ${data.results[0].postedDate} (UTC)`));
+    }
+    else {
+      contentReddit.append(createTextElement('i', 'This image was uploaded on Reddit in many posts'));
+      contentReddit.append(createTextElement('p', ''))
+      data.results.forEach((result, i) => {
+        let subContent = document.createElement('div');
+        subContent.append(createTextElement('b', `Source #${parseInt(i) + 1}: `))
+        subContent.append(createAnchorElement(result.url));
+        subContent.append(createTextElement('p', `This image was posted to Reddit at ${result.postedDate} (UTC)`))
+
+        contentReddit.append(subContent);
+      });
+    }
+    addBadgeElement('reddit-result-title');
+  }
+  else {
+    contentReddit.append(createTextElement('p', 'Image source from Reddit: Not found'));
   }
 
-  fetchAnalysisResult(imageID, 'flickr_filename', 'flickr-result', handleResult);
+  rewriteElement('reddit-result', contentReddit);
 }
 
 const getRedditSource = async (imageID) => {
-  const handleResult = (data) => {
-    const content = document.createElement('div');
-    if (data.numOfResults) {
-      if (data.numOfResults === 1) {
-        content.append(createTextElement('p', 'Image source from Reddit: ', createAnchorElement(data.url[0])));
-        content.append(createTextElement('p', `This image was posted to Reddit at ${data.postedDate[0]} (UTC)`));
-      }
-      else {
-        content.append(createTextElement('i', 'This image was uploaded on Reddit in many posts'));
-        content.append(createTextElement('p', ''))
-        data.results.forEach((result, i) => {
-          let subContent = document.createElement('div');
-          subContent.append(createTextElement('b', `Source #${parseInt(i) + 1}: `))
-          subContent.append(createAnchorElement(result.url));
-          subContent.append(createTextElement('p', `This image was posted to Reddit at ${result.postedDate} (UTC)`))
+  fetchAnalysisResult(imageID, 'reddit_filename', 'reddit-result', handleRedditResult);
+}
 
-          content.append(subContent);
-        });
-      }
-    }
-    else {
-      content.append(createTextElement('p', 'Image source from Reddit: Not found'));
-    }
+const handleTwitterResult = (data) => {
+  // Twitter
+  const contentTwitter = document.createElement('div');
+  if (data.url === "Not found") {
+    contentTwitter.append(createTextElement('p', "Image doesn't seem to exist on Twitter"))
+  }
+  else {
+    contentTwitter.append(createTextElement('p', "Image was uploaded to Twitter at ", createAnchorElement(data.url)));
+    contentTwitter.append(createTextElement('p', `Upload time: ${data.uploaded_date}`));
 
-    rewriteElement('reddit-result', content);
+    addBadgeElement('twitter-result-title');
   }
 
-  fetchAnalysisResult(imageID, 'reddit_filename', 'reddit-result', handleResult);
+  rewriteElement('twitter-result', contentTwitter);
+
+}
+
+const getTwitterSource = async (imageID) => {
+  fetchAnalysisResult(imageID, 'twitter_filename', 'twitter-result', handleTwitterResult);
 }
 
 const metadataExplanation = {};
