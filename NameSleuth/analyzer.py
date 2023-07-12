@@ -26,8 +26,8 @@ RE_PATTERNS = {
     "FACEBOOK_WITH_PHOTO_ID":    r'[0-9]+_[0-9]+_[0-9]+_[a-z]{1}_([0-9]+)',
     "FACEBOOK_WITHOUT_PHOTO_ID": r'[0-9]+_([0-9]+)_[0-9]+_[a-z]{1}',
 
-    "FLICKR_ID_GROUP_1":         r'^([0-9]+)_.+?(?:_(?:sq|s|m|l|q|n|z|t|w|c|b|h|k|f|3k|4k|5k|6k|o))$',
-    "FLICKR_ID_GROUP_2":         r'^.+?_([0-9]+)(?:_(?:sq|s|m|l|q|n|z|t|w|c|b|h|k|f|3k|4k|5k|6k|o))$',
+    "FLICKR_ID_GROUP_1":         r'^([0-9]+)_[^_]+?(?:_(?:sq|s|m|l|q|n|z|t|w|c|b|h|k|f|3k|4k|5k|6k|o))$',
+    "FLICKR_ID_GROUP_2":         r'^[^_]+?_([0-9]+)(?:_(?:sq|s|m|l|q|n|z|t|w|c|b|h|k|f|3k|4k|5k|6k|o))$',
 
     "TWITTER_PHOTO_ID":          r'([A-Za-z0-9\-]{15})',
 
@@ -307,15 +307,6 @@ def analyze_flickr_filename(filename):
     }
     matched_ids = re.findall(RE_PATTERNS["FLICKR_ID_GROUP_1"], filename) + \
         re.findall(RE_PATTERNS["FLICKR_ID_GROUP_2"], filename)
-
-    if len(matched_ids) > 0:
-        flkrid = matched_ids[0]
-        r = requests.get(
-            f'{URL_TEMPLATES["FLICKR_PHOTO"]}{flkrid}', headers=HEADERS)
-        res = find_flickr_posted_date(r.text)
-        if res != None:
-            analyze_result = res
-            analyze_result["url"] = f'{URL_TEMPLATES["FLICKR_PHOTO"]}{flkrid}'
 
     if len(matched_ids) > 0:
         flkrid = matched_ids[0]
